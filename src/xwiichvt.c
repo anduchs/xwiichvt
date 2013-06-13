@@ -39,9 +39,11 @@ int run_once(struct xwii_iface *iface)
 	struct vt_stat vtstat;
 	int vt = 0;
 	int i;
+	int console = 0;
+	char *device = "/dev/console";
+	//char *device = "/dev/tty0";
 	
-    int console = open("/dev/tty0", O_RDWR);
-//    int console = open("/dev/console", O_RDWR);
+    console = open(device, O_RDWR);
 	if (console < 0) {
         fprintf(stderr, "/dev/console problems. Do you have enough permission ?\n");
         exit(3);
@@ -50,6 +52,7 @@ int run_once(struct xwii_iface *iface)
         fprintf(stderr, "/dev/console problems. Do you have enough permission ?\n");
         exit(3);
     }
+    close(console);
     vt = vtstat.v_active;
     printf("Start vt %i.\n",vt);
     if (vt > 10)
@@ -75,6 +78,11 @@ int run_once(struct xwii_iface *iface)
 			printf("Error: Read failed with err:%d\n", ret);
 			return ret;
 		} else if (event.type == XWII_EVENT_KEY && event.v.key.state) {
+            console = open(device, O_RDWR); //got some errors when leaving console open over switches...
+	        if (console < 0) {
+                fprintf(stderr, "/dev/console problems. Do you have enough permission ?\n");
+                exit(3);
+            }
             if ((ioctl(console, VT_GETSTATE, &vtstat) < 0) || vt == -1) {
                 fprintf(stderr, "/dev/console problems. Do you have enough permission ?\n");
                 exit(3);
@@ -106,6 +114,7 @@ int run_once(struct xwii_iface *iface)
 			default:
 			    continue;
 			}
+			close(console);
 		}
 	}
 	return ret;

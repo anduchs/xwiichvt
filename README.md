@@ -17,3 +17,4 @@ TODO
 - Use udev-device-info as parameter (see service-files); use as parameter to allow multiple wiimotes
 - make this behaviour configurable ? Maybe udev-rules-tag (see service-files)
 - Make buttons, leds configurable
+- look for currently active vt even without keypress (forein VT-change); is there some kind of notifier ?
